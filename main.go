@@ -2,22 +2,42 @@ package main
 
 import (
 	"fmt"
+	"html/template"
 	"net/http"
+
+	"github.com/gorilla/mux"
 )
 
-func handlerFunc(w http.ResponseWriter, r *http.Request) {
+var homeTemplate *template.Template
+
+func home(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
-	if r.URL.Path == "/" {
-		fmt.Fprint(w, "<h1>Welcome to my awesome site!</h1>")
-	} else if r.URL.Path == "/contact" {
-		fmt.Fprint(w, "To get in touch, please send an email to <a href=\"mailto:support@lenslocked.com\">support@lenslocked.com</a>.")
-	} else {
-		w.WriteHeader(http.StatusNotFound)
-		fmt.Fprint(w, "<h1>We could not find the page we were looking for:(</h1><p>Please email us if you keep being send to an invalid page.</p>")
+	w.Header().Set("/", "home")
+	if err := homeTemplate.Execute(w, nil); err != nil {
+		panic(err)
 	}
 }
 
+func contact(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("/contact", "text/http")
+	fmt.Fprint(w, "<h1>To get in touch, please send an email to <a href=\"mailto:support@lenslocked.com\">support@lenslocked.com</a></h1>.")
+
+}
+
+func faq(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("/faq", "text/http")
+	fmt.Fprint(w, "<h1>Frequently Asked Questions...</h1>")
+}
+
 func main() {
-	http.HandleFunc("/", handlerFunc)
-	http.ListenAndServe(":3000", nil)
+	var err error
+	homeTemplate, err = template.ParseFiles("views/home.gohtml")
+	if err != nil {
+		panic(err)
+	}
+	r := mux.NewRouter()
+	r.HandleFunc("/", home)
+	r.HandleFunc("/contact", contact)
+	r.HandleFunc("/faq", faq)
+	http.ListenAndServe(":3000", r)
 }

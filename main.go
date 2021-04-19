@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"PhotoGO/views"
-
 	"github.com/gorilla/mux"
 )
 

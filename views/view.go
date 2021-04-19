@@ -2,7 +2,6 @@ package views
 
 import (
 	"html/template"
-	"text/template"
 )
 
 func NewView(files ...string) *View {

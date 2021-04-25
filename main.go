@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"html/template"
 	"net/http"
 
 	"github.com/andreac-flyt/PhotoGO/internal/views"
@@ -11,20 +10,21 @@ import (
 )
 
 var (
-		contactTemplate *template.Template
+	homeView    *views.View
+	contactView *views.View
 )
 
 func home(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
-	w.Header().Set("/", "home")
-	homeTemplate := views.NewView("internal/views/home.gohtml")
-	if err := homeTemplate.Template.Execute(w, nil); err != nil {
+	err := homeView.Template.Execute(w, nil)
+	if err != nil {
 		panic(err)
 	}
 }
 func contact(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
-	if err := contactTemplate.Execute(w, nil); err != nil {
+	err := contactView.Template.Execute(w, nil)
+	if err != nil {
 		panic(err)
 	}
 }
@@ -35,6 +35,8 @@ func faq(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	homeView = views.NewView("internal/views/home.gohtml")
+	contactView = views.NewView("internal/views/contact.gohtml")
 
 	r := mux.NewRouter()
 	r.HandleFunc("/", home)
